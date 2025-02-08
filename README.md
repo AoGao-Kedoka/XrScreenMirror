@@ -3,7 +3,7 @@ XrScreenMirror is a simple tool to mirror the desktop window to a VR headset. It
 
 Build with [XRLib_Renderer](https://github.com/AoGao-Kedoka/XRLib_Renderer)
 
-![XrScreenMirror](./imgs/screenshot.gif)
+<img src="./imgs/screenshot.gif" width="50%">
 
 ## Build
 ```
