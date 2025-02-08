@@ -4,23 +4,22 @@
 #include "ICapture.h"
 #include "X11/Xlib.h"
 #include "X11/Xutil.h"
-#include <X11/extensions/Xrandr.h>
 #include "stdio.h"
+#include <X11/extensions/Xrandr.h>
 
-
-class LinuxCapture : public ICapture{
-    public:
+class LinuxCapture : public ICapture {
+   public:
     LinuxCapture();
     std::vector<uint8_t> CaptureScreen() override;
     ~LinuxCapture();
 
-    private:
+   private:
     bool GetPrimaryDisplayDimensions();
 
-    private:
+   private:
     XImage* prevImage{nullptr};
     Display* m_display{nullptr};
     std::vector<uint8_t> data;
-    int x = 0, y=0;
+    int x = 0, y = 0;
 };
 #endif

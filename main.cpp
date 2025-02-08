@@ -1,6 +1,6 @@
-#include "XRLib.h"
-#include "ICapture.h"
 #include "CustomPass.h"
+#include "ICapture.h"
+#include "XRLib.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #include "WindowsCapture.h"
@@ -8,13 +8,13 @@
 #include "LinuxCapture.h"
 #endif
 
-void UpdateImageBuffer(XRLib::Graphics::VkCore& core, XRLib::Graphics::Image& img, XRLib::Graphics::Buffer& deviceBuffer);
+void UpdateImageBuffer(XRLib::Graphics::VkCore& core, XRLib::Graphics::Image& img,
+                       XRLib::Graphics::Buffer& deviceBuffer);
 
 int main() {
     XRLib::XRLib xrLib;
 
-    xrLib.SetVersionNumber(1, 0, 0)
-        .SetApplicationName("XrScreenMirror");
+    xrLib.SetVersionNumber(1, 0, 0).SetApplicationName("XrScreenMirror");
 
     XRLib::Transform planeTransform;
 
@@ -27,14 +27,12 @@ int main() {
 #endif
 
     // initialize custom pass
-    auto customRenderBehavior = std::make_unique<CustomPass>(xrLib.GetVkCore(), xrLib.SceneBackend(), &xrLib.RenderBackend().RenderPasses, true);
+    auto customRenderBehavior = std::make_unique<CustomPass>(xrLib.GetVkCore(), xrLib.SceneBackend(),
+                                                             &xrLib.RenderBackend().RenderPasses, true);
     auto rawCustomRenderBehaviorPtr = customRenderBehavior.get();
 
     // define transformations and load meshes
-    planeTransform
-        .Scale(glm::vec3(0.4, 0.2, 0.05))
-        .Rotate(glm::vec3(1, 0, 0), 90)
-        .Translate(glm::vec3(0, -100, -10));
+    planeTransform.Scale(glm::vec3(0.4, 0.2, 0.05)).Rotate(glm::vec3(1, 0, 0), 90).Translate(glm::vec3(0, -100, -10));
 
     XRLib::Entity* plane{nullptr};
     XRLib::Entity* leftHand{nullptr};
@@ -42,8 +40,10 @@ int main() {
 
     xrLib.SceneBackend()
         .LoadMeshAsyncWithBinding({"./resources/plane.obj", planeTransform}, plane)
-        .LoadMeshAsyncWithBinding({"./resources/leftHand.glb"}, leftHand).AttachEntityToLeftControllerPose(leftHand)
-        .LoadMeshAsyncWithBinding({"./resources/rightHand.glb"}, rightHand).AttachEntityToRightcontrollerPose(rightHand)
+        .LoadMeshAsyncWithBinding({"./resources/leftHand.glb"}, leftHand)
+        .AttachEntityToLeftControllerPose(leftHand)
+        .LoadMeshAsyncWithBinding({"./resources/rightHand.glb"}, rightHand)
+        .AttachEntityToRightcontrollerPose(rightHand)
         .WaitForAllMeshesToLoad();
 
     auto planeMesh = static_cast<XRLib::Mesh*>(plane);
@@ -55,26 +55,27 @@ int main() {
     // initialize lib
     xrLib.Init(true, std::move(customRenderBehavior));
 
-    if (!xrLib.GetXrCore().IsXRValid()){
+    if (!xrLib.GetXrCore().IsXRValid()) {
         std::cout << "XR is not valid" << std::endl;
         return -1;
     }
-    
+
     // render loop
     while (!xrLib.ShouldStop()) {
         data = capture->CaptureScreen();
         auto size = capture->Width * capture->Height * 4;
-        std::unique_ptr<XRLib::Graphics::Buffer> imageBuffer = 
-            std::make_unique<XRLib::Graphics::Buffer>(xrLib.GetVkCore(), size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                                                   static_cast<void*>(data.data()), false);
+        std::unique_ptr<XRLib::Graphics::Buffer> imageBuffer = std::make_unique<XRLib::Graphics::Buffer>(
+            xrLib.GetVkCore(), size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, static_cast<void*>(data.data()), false);
         UpdateImageBuffer(xrLib.GetVkCore(), *rawCustomRenderBehaviorPtr->textures[0], *imageBuffer);
+
         xrLib.Run();
     }
 
     return 0;
 }
 
-void UpdateImageBuffer(XRLib::Graphics::VkCore& core, XRLib::Graphics::Image& img, XRLib::Graphics::Buffer& hostBuffer){
+void UpdateImageBuffer(XRLib::Graphics::VkCore& core, XRLib::Graphics::Image& img,
+                       XRLib::Graphics::Buffer& hostBuffer) {
     auto format = img.GetFormat();
 
     // transition from image layout shader read only to transfer destination (not implemented in XRLib, hence manual transition)
@@ -103,12 +104,8 @@ void UpdateImageBuffer(XRLib::Graphics::VkCore& core, XRLib::Graphics::Image& im
     VkPipelineStageFlags destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 
     // Submit the barrier
-    vkCmdPipelineBarrier(
-        commandBuffer.GetCommandBuffer(),
-        sourceStage, destinationStage,
-        0, 0, nullptr, 0, nullptr, // No buffer barriers
-        1, &barrier // One image barrier
-    );
+    vkCmdPipelineBarrier(commandBuffer.GetCommandBuffer(), sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1,
+                         &barrier);
 
     XRLib::Graphics::CommandBuffer::EndSingleTimeCommands(commandBuffer);
 

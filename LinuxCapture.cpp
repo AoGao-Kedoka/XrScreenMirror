@@ -1,19 +1,19 @@
 #include "LinuxCapture.h"
 
 #if defined(__linux__)
-LinuxCapture::LinuxCapture(){
+LinuxCapture::LinuxCapture() {
     Display* display = XOpenDisplay(NULL);
     if (!display) {
         fprintf(stderr, "Unable to open X display\n");
     }
     m_display = display;
-    if (!GetPrimaryDisplayDimensions()){
+    if (!GetPrimaryDisplayDimensions()) {
         XCloseDisplay(display);
         return;
     }
 }
 
-LinuxCapture::~LinuxCapture(){
+LinuxCapture::~LinuxCapture() {
     XCloseDisplay(m_display);
 }
 
@@ -57,7 +57,7 @@ bool LinuxCapture::GetPrimaryDisplayDimensions() {
     XRRFreeScreenResources(screenResources);
     return success;
 }
-std::vector<uint8_t> LinuxCapture::CaptureScreen(){
+std::vector<uint8_t> LinuxCapture::CaptureScreen() {
     Window root = DefaultRootWindow(m_display);
     XImage* image = XGetImage(m_display, root, x, y, Width, Height, AllPlanes, ZPixmap);
     if (!image) {
@@ -71,10 +71,10 @@ std::vector<uint8_t> LinuxCapture::CaptureScreen(){
 
     // Correct BGRA to RGBA
     for (size_t i = 0; i < imageSize; i += 4) {
-        data[i + 0] = imageData[i + 2]; // Red   <- Blue
-        data[i + 1] = imageData[i + 1]; // Green <- Green
-        data[i + 2] = imageData[i + 0]; // Blue  <- Red
-        data[i + 3] = imageData[i + 3]; // Alpha <- Alpha
+        data[i + 0] = imageData[i + 2];    // Red   <- Blue
+        data[i + 1] = imageData[i + 1];    // Green <- Green
+        data[i + 2] = imageData[i + 0];    // Blue  <- Red
+        data[i + 3] = imageData[i + 3];    // Alpha <- Alpha
     }
     XDestroyImage(image);
     return data;

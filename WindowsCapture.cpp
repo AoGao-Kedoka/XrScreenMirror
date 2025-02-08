@@ -6,13 +6,13 @@ WindowsCapture::WindowsCapture() {
     Height = GetSystemMetrics(SM_CYSCREEN);
 }
 
-std::vector<uint8_t> WindowsCapture::CaptureScreen(){
+std::vector<uint8_t> WindowsCapture::CaptureScreen() {
     HDC hScreenDC = GetDC(NULL);
     HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
 
     // Create a bitmap compatible with the screen DC.
     HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, Width, Height);
-    if(!hBitmap){
+    if (!hBitmap) {
         DeleteDC(hMemoryDC);
         ReleaseDC(NULL, hScreenDC);
         return {};
@@ -34,7 +34,7 @@ std::vector<uint8_t> WindowsCapture::CaptureScreen(){
 
     // Allocate buffer for the pixel data.
     std::vector<uint8_t> data(Width * Height * 4);
-    if(!GetDIBits(hMemoryDC, hBitmap, 0, Height, data.data(), &bmi, DIB_RGB_COLORS)){
+    if (!GetDIBits(hMemoryDC, hBitmap, 0, Height, data.data(), &bmi, DIB_RGB_COLORS)) {
         data.clear();
     }
 
@@ -44,12 +44,12 @@ std::vector<uint8_t> WindowsCapture::CaptureScreen(){
     ReleaseDC(NULL, hScreenDC);
 
     // Return pixel data (format is BGRA; convert to RGBA if needed)
-    for(size_t i = 0; i < data.size(); i += 4) {
-        uint8_t temp = data[i]; // Blue
-        data[i] = data[i+2];     // Red
-        data[i+2] = temp;        // Blue
+    for (size_t i = 0; i < data.size(); i += 4) {
+        uint8_t temp = data[i];    // Blue
+        data[i] = data[i + 2];     // Red
+        data[i + 2] = temp;        // Blue
     }
-    
+
     return data;
 }
 #endif
