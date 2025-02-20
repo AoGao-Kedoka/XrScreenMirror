@@ -2,8 +2,11 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 WindowsCapture::WindowsCapture() {
-    Width = GetSystemMetrics(SM_CXSCREEN);
-    Height = GetSystemMetrics(SM_CYSCREEN);
+    SetProcessDPIAware();
+    HDC screenDC = GetDC(NULL);
+    Width = GetDeviceCaps(screenDC, HORZRES);
+    Height = GetDeviceCaps(screenDC, VERTRES);
+    ReleaseDC(NULL, screenDC);
 }
 
 std::vector<uint8_t> WindowsCapture::CaptureScreen() {

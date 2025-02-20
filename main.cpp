@@ -46,11 +46,13 @@ int main() {
         .AttachEntityToRightcontrollerPose(rightHand)
         .WaitForAllMeshesToLoad();
 
-    auto planeMesh = static_cast<XRLib::Mesh*>(plane);
+    std::cout << xrLib.SceneBackend();
+
+    // ugly way to get the actual mesh
+    auto planeMesh = static_cast<XRLib::Mesh*>(plane->GetChilds()[0]->GetChilds()[0].get());
     auto data = capture->CaptureScreen();
 
     planeMesh->Diffuse = {data, capture->Width, capture->Height, 4};
-    std::cout << xrLib.SceneBackend();
 
     // initialize lib
     xrLib.Init(true, std::move(customRenderBehavior));
