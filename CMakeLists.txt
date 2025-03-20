@@ -8,7 +8,7 @@ include(FetchContent)
 FetchContent_Declare(
 	XRLib
     GIT_REPOSITORY git@github.com:AoGao-Kedoka/XRLib.git
-	GIT_TAG main
+	GIT_TAG 4ee6587e76a066ca908384da50ebe54310845042
  )
 FetchContent_MakeAvailable(XRLib)
 

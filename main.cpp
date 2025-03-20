@@ -14,7 +14,10 @@ void UpdateImageBuffer(XRLib::Graphics::VkCore& core, XRLib::Graphics::Image& im
 int main() {
     XRLib::XRLib xrLib;
 
-    xrLib.SetVersionNumber(1, 0, 0).SetApplicationName("XrScreenMirror");
+    xrLib.SetVersionNumber(1, 0, 0)
+        .SetApplicationName("XrScreenMirror")
+        .SetCustomOpenXRRuntime("~/Tools/MetaXRSimulator/meta_openxr_simulator.json");
+    
 
     XRLib::Transform planeTransform;
 
@@ -48,8 +51,7 @@ int main() {
 
     std::cout << xrLib.SceneBackend();
 
-    // ugly way to get the actual mesh
-    auto planeMesh = static_cast<XRLib::Mesh*>(plane->GetChilds()[0]->GetChilds()[0].get());
+    auto planeMesh = static_cast<XRLib::Mesh*>(plane);
     auto data = capture->CaptureScreen();
 
     planeMesh->Diffuse = {data, capture->Width, capture->Height, 4};
